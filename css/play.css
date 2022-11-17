@@ -1,0 +1,12 @@
+.display-soal {
+  display: flex;
+  height: 10rem;
+  background-color: white;
+  border-radius: 1rem;
+  border: 1px solid lightgray;
+  box-shadow: 0 4px 7px rgba(0, 0, 0, 0.3);
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  font-weight: bold;
+}
