@@ -10,3 +10,12 @@
   font-size: 2rem;
   font-weight: bold;
 }
+
+.btn-collapse-chevron {
+  transition: 500ms;
+  border: none;
+}
+
+.btn-collapse-chevron:not(.collapsed) {
+  transform: rotate(-180deg);
+}

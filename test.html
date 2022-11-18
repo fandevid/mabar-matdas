@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>belajar html</title>
+  </head>
+  <body>
+    <h1>tulisan</h1>
+    <button id="tombolsatu">klik</button>
+
+    <script>
+      var tombol = document.getElementById("tombolsatu");
+
+      tombol.onclick = () => {
+        tombol.innerHTML = "fdsggfgfsg";
+      };
+
+      var waktu = 3;
+      timer = setInterval(() => {
+        waktu -= 2;
+        if (waktu < 0) {
+          waktu = 0;
+          clearInterval(timer);
+        }
+        tombol.innerHTML = waktu + " detik";
+      }, 2000);
+
+      // setTimeout(() => {
+      //   clearInterval(timer);
+      // }, 3000);
+      // tambah("g3ehe");
+      // tambah("gg");
+    </script>
+  </body>
+</html>

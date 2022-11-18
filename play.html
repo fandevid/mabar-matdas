@@ -49,15 +49,41 @@
         <section>
           <div class="room-information">
             <div class="bg-white mb-3 gap-1 d-flex align-items-center justify-content-evenly p-2 rounded" style="border: 1px solid lightgrey">
-              <div class="w-100 text-center text-primary">Kode: <span class="room_code"></span></div>
-              |
+              <!-- <div class="w-100 text-center text-primary">Kode: <span class="room_code"></span></div>
+                <span class="opacity-25">|</span> -->
+              <!-- <span class="opacity-25">|</span> -->
               <div class="w-100 text-center">Score: 34</div>
-              |
+              <span class="opacity-25">|</span>
               <div class="w-100 text-center">47 Detik</div>
-              <!-- <button class="btn p-1 btn-outline-success"><i class="bx bxl-whatsapp bx-fw"></i></button> -->
-              <!-- <button class="btn py-1 btn-outline-primary ps-0" style="width: 8em;"><i class="bx bx-play bx-fw"></i>Mulai</button> -->
-              <!-- <a class=""><i class="bx bxl-whatsapp bx-fw"></i>Undang</a> -->
-              <!-- <a class="btn btn-outline-warning py-1 w-100"><i class="bx bx-play bx-fw"></i>Mulai</a> -->
+              <span class="opacity-25">|</span>
+              <!-- <button class="btn btn-sm btn-success p-" title="Undang Teman">Undang</button> -->
+              <a href="#collapseGameInfo" data-bs-toggle="collapse" class="btn btn-sm p-1 btn-collapse-chevron collapsed" title="Undang Teman"><i class="bx bx-chevrons-down bx-fw"></i></a>
+            </div>
+
+            <div class="collapse" id="collapseGameInfo">
+              <div class="bg-white mb-3 p-2 rounded" style="border: 1px solid lightgrey">
+                <div>
+                  <table>
+                    <tr>
+                      <td>Kode Room</td>
+                      <td class="px-1">:</td>
+                      <td><strong class="room-code"></strong></td>
+                    </tr>
+                    <tr>
+                      <td>Pembuat</td>
+                      <td class="px-1">:</td>
+                      <td><span class="room-author">Muhammad Irfan</span></td>
+                    </tr>
+                    <tr>
+                      <td>Tanggal</td>
+                      <td class="px-1">:</td>
+                      <td><span class="room-created">23-10-2022</span></td>
+                    </tr>
+                  </table>
+                </div>
+                <!-- <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis ducimus iste corrupti doloremque assumenda a commodi qui aliquam quod eius.</p> -->
+                <button type="" href="//api.whatsapp.com/send?text=fandevid.com" class="btn btn-success btn-sm mt-2"><i class="bx bxl-whatsapp bx-fw"></i>Undang Teman</button>
+              </div>
             </div>
           </div>
         </section>
@@ -80,7 +106,7 @@
       import { getDatabase, ref, set, onValue, child, get } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-database.js";
       // TODO: Add SDKs for Firebase products that you want to use
       // https://firebase.google.com/docs/web/setup#available-libraries
-
+      document.querySelector(".btn-collapse-chevron").click();
       // Your web app's Firebase configuration
       // For Firebase JS SDK v7.20.0 and later, measurementId is optional
       const firebaseConfig = {
@@ -115,15 +141,16 @@
       const Game = {
         roomCode: urlParams.get("room"),
       };
-      document.querySelector(".room-information .room_code").innerText = Game.roomCode;
+      document.querySelector(".room-information .room-code").innerText = Game.roomCode;
 
       // Get Room Information
       get(child(ref(db, "rooms"), String(Game.roomCode)))
         .then((snapshot) => {
           if (snapshot.exists()) {
-            console.log(snapshot.val());
-            try {
-            } catch (error) {}
+            const data = snapshot.val();
+            for (const key of Object.keys(data)) Game[key] = data[key];
+            if (data.created) Game.created = new Date(data.created);
+            console.log(Game.created.getDay());
           } else {
             alert("Maaf, room tidak ditemukan!");
             window.location.href = "index.html";
