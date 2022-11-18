@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Mabar Game Matematika Online" />
     <title>Selamat Datang - M. Irfan</title>
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap" />
@@ -11,6 +12,14 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
     <link rel="stylesheet" href="css/play.css" />
     <link rel="stylesheet" href="style.css" />
+    <script>
+      var session = window.sessionStorage;
+      // Check Session
+      if (!session.getItem("player_id") || !session.getItem("name")) {
+        session.setItem("name", prompt("Siapa nama lengkap anda?"));
+        session.setItem("player_id", "player_" + Math.floor(Math.random() * 10000));
+      }
+    </script>
   </head>
   <body>
     <header>
@@ -92,7 +101,7 @@
           <div class="display-soal">9 x 15 : 18 = ?</div>
         </section>
         <section>
-          <div class=""></div>
+          <div class="leaderboard"></div>
         </section>
       </div>
     </main>
@@ -127,13 +136,10 @@
       const db = getDatabase(app);
 
       var session = window.sessionStorage;
-
       // Check Session
-      if (!session.getItem("player_id")) {
-        session.setItem("player_id", "player_" + Math.floor(Math.random() * 10000));
-      }
-      if (!session.getItem("player_id")) {
+      if (!session.getItem("player_id") || !session.getItem("name")) {
         session.setItem("name", prompt("Siapa nama lengkap anda?"));
+        session.setItem("player_id", "player_" + Math.floor(Math.random() * 10000));
       }
 
       const urlParams = new URLSearchParams(window.location.search);
@@ -143,7 +149,7 @@
         roomCode: urlParams.get("room"),
       };
       document.querySelector(".room-information .room-code").innerText = Game.roomCode;
-      document.querySelector(".room-information .btn-invite").href = `//api.whatsapp.com/send?text=${window.location.href}`;
+      document.querySelector(".room-information .btn-invite").href = `//api.whatsapp.com/send?text=Mabar%20yuk%2C%0A${window.location.href}`;
 
       // console.log(window.location.href);
 
@@ -154,18 +160,36 @@
             const data = snapshot.val();
             for (const key of Object.keys(data)) Game[key] = data[key];
             if (data.created) Game.created = new Date(data.created);
-
-            if (Game.author) document.querySelector(".room-author").innerText = Game.author;
-            if (Game.created) document.querySelector(".room-created").innerText = Game.created.getDate();
-            // console.log(Game.created.getDay());
+            if (Game.author) document.querySelector(".room-information .room-author").innerText = Game.author;
+            if (Game.created) document.querySelector(".room-information .room-created").innerText = Game.created.toLocaleString();
+            if (!Game.players[session.getItem("player_id")])
+              set(ref(db, `rooms/${String(Game.roomCode)}/players/${session.getItem("player_id")}`), {
+                name: session.getItem("name"),
+                id: session.getItem("player_id"),
+                score: 0,
+              });
           } else {
             alert("Maaf, room tidak ditemukan!");
             window.location.href = "index.html";
           }
         })
+        .then(() => {
+          onValue(ref(db, `rooms/${Game.roomCode}/players`), (snapshot) => {
+            if (!snapshot.exists()) return;
+            const data = snapshot.val();
+            Game.players = data;
+            const leaderboard = document.querySelector(".leaderboard");
+            console.log(data);
+            for (const player_id of Object.keys(data)) {
+              const item = document.createElement("div");
+              item.innerHTML = `<div>${data[player_id]["name"]}</div><div>${data[player_id]["score"]}</div>`;
+              leaderboard.appendChild(item);
+            }
+          });
+        })
         .catch((error) => {
           alert("Terjadi kesalahan, silahkan coba lagi.");
-          window.location.href = "index.html";
+          // window.location.href = "index.html";
           console.error(error);
         });
     </script>

@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Mabar Game Matematika Online" />
     <title>Selamat Datang - M. Irfan</title>
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap" />
@@ -11,6 +12,14 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
 
     <link rel="stylesheet" href="style.css" />
+    <script>
+      var session = window.sessionStorage;
+      // Check Session
+      if (!session.getItem("player_id") || !session.getItem("name")) {
+        session.setItem("name", prompt("Siapa nama lengkap anda?"));
+        session.setItem("player_id", "player_" + Math.floor(Math.random() * 10000));
+      }
+    </script>
   </head>
   <body>
     <header>
@@ -95,10 +104,7 @@
       var session = window.sessionStorage;
 
       // Check Session
-      if (!session.getItem("player_id") || !session.getItem("name")) {
-        session.setItem("name", prompt("Siapa nama lengkap anda?"));
-        session.setItem("player_id", "player_" + Math.floor(Math.random() * 10000));
-      }
+      
 
       const btnCreateRoom = document.querySelector("button.btn-create-room");
       btnCreateRoom.addEventListener("click", createRoom);
