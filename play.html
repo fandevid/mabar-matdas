@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Selamat Datang - M. Irfan</title>
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap" />
@@ -72,17 +73,17 @@
                     <tr>
                       <td>Pembuat</td>
                       <td class="px-1">:</td>
-                      <td><span class="room-author">Muhammad Irfan</span></td>
+                      <td><span class="room-author"></span></td>
                     </tr>
                     <tr>
                       <td>Tanggal</td>
                       <td class="px-1">:</td>
-                      <td><span class="room-created">23-10-2022</span></td>
+                      <td><span class="room-created"></span></td>
                     </tr>
                   </table>
                 </div>
                 <!-- <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Perferendis ducimus iste corrupti doloremque assumenda a commodi qui aliquam quod eius.</p> -->
-                <button type="" href="//api.whatsapp.com/send?text=fandevid.com" class="btn btn-success btn-sm mt-2"><i class="bx bxl-whatsapp bx-fw"></i>Undang Teman</button>
+                <a target="__blank" class="btn btn-success btn-sm mt-2 btn-invite"><i class="bx bxl-whatsapp bx-fw"></i>Undang Teman</a>
               </div>
             </div>
           </div>
@@ -142,6 +143,9 @@
         roomCode: urlParams.get("room"),
       };
       document.querySelector(".room-information .room-code").innerText = Game.roomCode;
+      document.querySelector(".room-information .btn-invite").href = `//api.whatsapp.com/send?text=${window.location.href}`;
+
+      // console.log(window.location.href);
 
       // Get Room Information
       get(child(ref(db, "rooms"), String(Game.roomCode)))
@@ -150,7 +154,10 @@
             const data = snapshot.val();
             for (const key of Object.keys(data)) Game[key] = data[key];
             if (data.created) Game.created = new Date(data.created);
-            console.log(Game.created.getDay());
+
+            if (Game.author) document.querySelector(".room-author").innerText = Game.author;
+            if (Game.created) document.querySelector(".room-created").innerText = Game.created.getDate();
+            // console.log(Game.created.getDay());
           } else {
             alert("Maaf, room tidak ditemukan!");
             window.location.href = "index.html";
