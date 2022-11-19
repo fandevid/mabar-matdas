@@ -12,14 +12,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
 
     <link rel="stylesheet" href="style.css" />
-    <script>
-      var session = window.sessionStorage;
-      // Check Session
-      if (!session.getItem("player_id") || !session.getItem("name")) {
-        session.setItem("name", prompt("Siapa nama lengkap anda?"));
-        session.setItem("player_id", "player_" + Math.floor(Math.random() * 10000));
-      }
-    </script>
   </head>
   <body>
     <header>
@@ -70,6 +62,8 @@
           </div>
         </div>
       </section>
+      <button class="btn btn-primary btn-sign-in">Login With Google</button>
+      <button class="btn btn-primary btn-sign-out">LogOut</button>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
@@ -78,9 +72,8 @@
     <script type="module">
       // Import the functions you need from the SDKs you need
       import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
-      import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-analytics.js";
-      import { getDatabase, ref, set, onValue, child, get } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-database.js";
       import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js";
+      // import { GoogleAuthProvider } from "firebase/auth";
 
       // TODO: Add SDKs for Firebase products that you want to use
       // https://firebase.google.com/docs/web/setup#available-libraries
@@ -100,16 +93,19 @@
 
       // Initialize Firebase
       const app = initializeApp(firebaseConfig);
-      const analytics = getAnalytics(app);
-      const db = getDatabase(app);
-
       const auth = getAuth();
       const provider = new GoogleAuthProvider();
       provider.addScope("https://www.googleapis.com/auth/contacts.readonly");
       provider.setCustomParameters({
         login_hint: "user@example.com",
       });
-      function doSignIn() {
+
+      const email = "ada@gmails.com";
+      const password = "adakami123";
+
+      function doSignUp() {}
+
+      function doSignIn2() {
         signInWithRedirect(auth, provider);
       }
       getRedirectResult(auth)
@@ -133,22 +129,29 @@
           // ...
           console.log("error Login", errorMessage);
         });
-      console.log("currUser", auth.currentUser);
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          // User is signed in, see docs for a list of available properties
-          // https://firebase.google.com/docs/reference/js/firebase.User
-          const uid = user.uid;
-          alert("SignIn", user);
-
-          // ...
-        } else {
-          alert("SignOut", user);
-          doSignIn();
-          // User is signed out
-          // ...
-        }
-      });
+      function doSignIn() {
+        signInWithPopup(auth, provider)
+          .then((result) => {
+            // This gives you a Google Access Token. You can use it to access the Google API.
+            const credential = GoogleAuthProvider.credentialFromResult(result);
+            const token = credential.accessToken;
+            // The signed-in user info.
+            const user = result.user;
+            // ...
+            console.log("Success Login", user);
+          })
+          .catch((error) => {
+            // Handle Errors here.
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            // The email of the user's account used.
+            const email = error.customData.email;
+            // The AuthCredential type that was used.
+            const credential = GoogleAuthProvider.credentialFromError(error);
+            console.log("error Login", errorMessage);
+            // ...
+          });
+      }
       function doSignOut() {
         signOut(auth)
           .then(() => {
@@ -161,75 +164,21 @@
           });
       }
 
-      var session = window.sessionStorage;
-
-      // Check Session
-
-      const btnCreateRoom = document.querySelector("button.btn-create-room");
-      btnCreateRoom.addEventListener("click", createRoom);
-
-      const formJoinRoom = document.forms["form_join_room"];
-      formJoinRoom.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const inp = e.target[0];
-        const btn = e.target[1];
-        btn.disabled = true;
-        // Check room in database
-        const dbRef = ref(db, "rooms");
-        get(child(dbRef, inp.value))
-          .then((snapshot) => {
-            if (snapshot.exists()) {
-              document.location.href = `play.html?room=${inp.value}`;
-            } else {
-              alert(`Maaf, room [${inp.value}] tidak ditemukan!`);
-              btn.disabled = false;
-            }
-          })
-          .catch((error) => {
-            alert("Terjadi kesalahan, silahkan coba lagi.");
-            console.error(error);
-            btn.disabled = false;
-          });
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          // User is signed in, see docs for a list of available properties
+          // https://firebase.google.com/docs/reference/js/firebase.User
+          const uid = user.uid;
+          console.log("SignIn", user);
+          // ...
+        } else {
+          console.log("SignOut", user);
+          // User is signed out
+          // ...
+        }
       });
-
-      function createRoom() {
-        const room = String(Math.floor(Math.random() * 10000));
-        const author = session.getItem("name");
-        set(ref(db, "rooms/" + room), {
-          author: author,
-          created: new Date().getTime(),
-          questions: null,
-          players: {},
-          playing: false,
-        })
-          .then(() => {
-            get(child(ref(db, "rooms"), room)).then((snapshot) => {
-              if (snapshot.exists()) return (document.location.href = "play.html?room=" + room);
-              alert("Gagal membuat room baru, silahkan coba lagi!");
-            });
-          })
-          .catch((error) => {
-            alert("Terjadi kesalahan, silahkan coba lagi!");
-          });
-        // onValue(ref(db, "rooms/" + room), (snapshot) => {
-        //   console.log("room telah berubah", snapshot);
-        // });
-      }
-
-      function getData(room_id) {
-        const dbRef = ref(db);
-        get(child(dbRef, "rooms/" + room_id))
-          .then((snapshot) => {
-            if (snapshot.exists()) {
-              console.log(snapshot.val());
-            } else {
-              console.log("No data available");
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-          });
-      }
+      document.querySelector(".btn-sign-in").onclick = doSignIn2;
+      document.querySelector(".btn-sign-out").onclick = doSignOut;
     </script>
   </body>
 </html>

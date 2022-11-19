@@ -164,7 +164,7 @@
             for (const key in data) Game[key] = data[key];
             if (data.created) Game.created = new Date(data.created);
             if (data.author) document.querySelector(".room-information .room-author").innerText = data.author;
-            if (data.created) document.querySelector(".room-information .room-created").innerText = data.created.toLocaleString();
+            if (data.created) document.querySelector(".room-information .room-created").innerText = new Date(data.created).toLocaleString();
             if (!data.hasOwnProperty(session.getItem("player_id")))
               set(ref(db, `rooms/${String(Game.roomCode)}/players/${session.getItem("player_id")}`), {
                 name: session.getItem("name"),
