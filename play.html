@@ -112,7 +112,7 @@
       import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-analytics.js";
       import { getDatabase, ref, set, onValue, child, get } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-database.js";
-      import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js";
+      import { getAuth, GoogleAuthProvider, onAuthStateChanged, getRedirectResult, signInWithRedirect, signOut } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js";
 
       window.onload = () => {
         document.querySelector(".btn-collapse-chevron").click();
@@ -150,38 +150,39 @@
       const auth = getAuth();
       const provider = new GoogleAuthProvider();
       // provider.addScope("https://www.googleapis.com/auth/contacts.readonly");
+
       onAuthStateChanged(auth, (user) => {
         if (user) {
           const uid = user.uid;
           session.setItem("uid", uid);
           displayName.innerText = user.displayName;
+          console.log("sudah login");
+          start();
         } else {
+          console.log("belum login");
           session.removeItem("uid");
           displayName.innerText = "Anda Belum Login";
+          doSignIn();
+          // alert("do Login");
         }
       });
-      function doSignIn() {
-        signInWithPopup(auth, provider)
-          .then((result) => {
-            // This gives you a Google Access Token. You can use it to access the Google API.
-            const credential = GoogleAuthProvider.credentialFromResult(result);
-            const token = credential.accessToken;
-            // The signed-in user info.
+      getRedirectResult(auth)
+        .then((result) => {
+          if (result) {
             const user = result.user;
-            // ...
-            console.log("Success Login", user);
-            alert("Selamat datang, " + user.displayName);
-          })
-          .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            // The email of the user's account used.
-            const email = error.customData.email;
-            // The AuthCredential type that was used.
-            const credential = GoogleAuthProvider.credentialFromError(error);
-            console.log("error Login", errorMessage);
-            // ...
-          });
+            const uid = user.uid;
+            session.setItem("uid", uid);
+            displayName.innerText = user.displayName;
+          }
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log("error Login", errorMessage);
+          // ...
+        });
+      function doSignIn() {
+        signInWithRedirect(auth, provider);
       }
       function doSignOut() {
         signOut(auth)
@@ -209,56 +210,56 @@
       document.querySelector(".room-information .btn-invite").href = `//api.whatsapp.com/send?text=Mabar%20yuk%2C%0A${window.location.href}`;
 
       // console.log(window.location.href);
-      if (!session.getItem("uid")) {
-        // if (confirm("Anda harus login terlebih dahulu!")) {
-        // alert("anda belum login gabisa");
-        doSignIn();
-        // return;
-      }
+
       // Get Room Information
-      get(child(ref(db, "rooms"), String(Game.roomCode)))
-        .then((snapshot) => {
-          if (snapshot.exists()) {
-            // Kode room valid
-            const data = snapshot.val();
-            for (const key in data) Game[key] = data[key];
-            if (data.created) Game.created = new Date(data.created);
-            if (data.author) document.querySelector(".room-information .room-author").innerText = data.author;
-            if (data.created) document.querySelector(".room-information .room-created").innerText = new Date(data.created).toLocaleString();
-            // Jika user belum terdaftar sbg player maka daftarkan
-            if (!data.hasOwnProperty(session.getItem("uid")))
-              set(ref(db, `rooms/${String(Game.roomCode)}/players/${session.getItem("uid")}`), {
-                name: auth.currentUser.displayName,
-                id: session.getItem("uid"),
-                score: 0,
-              });
-          } else {
-            // RoomCode tidak valid
-            alert("Maaf, room tidak ditemukan!");
-            window.location.href = "index.html";
-          }
-        })
-        .then(() => {
-          onValue(ref(db, `rooms/${Game.roomCode}/players`), (snapshot) => {
-            if (!snapshot.exists()) return;
-            const data = snapshot.val();
-            Game.players = data;
-            console.log(data);
-            const leaderboard = document.querySelector(".leaderboard .content");
-            leaderboard.innerText = "";
-            for (const player_id in data) {
-              const item = document.createElement("div");
-              item.classList.add("leaderboard-player");
-              item.innerHTML = `<div>${data[player_id]["name"]}</div><div>${data[player_id]["score"]}</div>`;
-              leaderboard.appendChild(item);
+      function start() {
+        if (!session.getItem("uid") || !auth.currentUser) {
+          return;
+        }
+        get(child(ref(db, "rooms"), String(Game.roomCode)))
+          .then((snapshot) => {
+            if (snapshot.exists()) {
+              // Kode room valid
+              const data = snapshot.val();
+              for (const key in data) Game[key] = data[key];
+              if (data.created) Game.created = new Date(data.created);
+              if (data.author) document.querySelector(".room-information .room-author").innerText = data.author;
+              if (data.created) document.querySelector(".room-information .room-created").innerText = new Date(data.created).toLocaleString();
+              // Jika user belum terdaftar sbg player maka daftarkan
+              if (!data.hasOwnProperty(session.getItem("uid")))
+                set(ref(db, `rooms/${String(Game.roomCode)}/players/${session.getItem("uid")}`), {
+                  name: auth.currentUser.displayName,
+                  id: session.getItem("uid"),
+                  score: 0,
+                });
+            } else {
+              // RoomCode tidak valid
+              alert("Maaf, room tidak ditemukan!");
+              window.location.href = "index.html";
             }
+          })
+          .then(() => {
+            onValue(ref(db, `rooms/${Game.roomCode}/players`), (snapshot) => {
+              if (!snapshot.exists()) return;
+              const data = snapshot.val();
+              Game.players = data;
+              console.log(data);
+              const leaderboard = document.querySelector(".leaderboard .content");
+              leaderboard.innerText = "";
+              for (const player_id in data) {
+                const item = document.createElement("div");
+                item.classList.add("leaderboard-player");
+                item.innerHTML = `<div>${data[player_id]["name"]}</div><div>${data[player_id]["score"]}</div>`;
+                leaderboard.appendChild(item);
+              }
+            });
+          })
+          .catch((error) => {
+            alert("Terjadi kesalahan, silahkan coba lagi.");
+            console.log(error);
+            // window.location.href = "index.html";
           });
-        })
-        .catch((error) => {
-          alert("Terjadi kesalahan, silahkan coba lagi.");
-          console.error(error);
-          // window.location.href = "index.html";
-        });
+      }
     </script>
   </body>
 </html>
