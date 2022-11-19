@@ -131,6 +131,7 @@
             const user = result.user;
             // ...
             console.log("Success Login", user);
+            alert("Selamat Datang, " + user.displayName);
           })
           .catch((error) => {
             const errorCode = error.code;
