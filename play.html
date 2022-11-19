@@ -12,14 +12,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
     <link rel="stylesheet" href="css/play.css" />
     <link rel="stylesheet" href="style.css" />
-    <script>
-      var session = window.sessionStorage;
-      // Check Session
-      if (!session.getItem("player_id") || !session.getItem("name")) {
-        session.setItem("name", prompt("Siapa nama lengkap anda?"));
-        session.setItem("player_id", "player_" + Math.floor(Math.random() * 10000));
-      }
-    </script>
   </head>
   <body>
     <header>
@@ -28,13 +20,16 @@
           <a href="#Id2" class="nav-item nav-link" role="button" data-bs-toggle="offcanvas" aria-controls="Id2"><i class="bx bx-fw bx-menu"></i></a>
           <a href="#" class="navbar-brand">MathBasic</a>
           <!-- <a href="" class="btn btn-sm btn-outline-success"><i class="bx bx-fw bxl-whatsapp"></i>Undang</a> -->
-          <div class="dropdown">
+          <div class="dropdown account-information">
             <a role="button" class="my-auto nav-item nav-link" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bx bx-fw bxs-user-circle"></i></a>
-            <ul class="dropdown-menu position-absolute dropdown-menu-end" style="max-width: 80vmin">
-              <li class="dropdown-item text-center">Informasi Akun</li>
+            <ul class="dropdown-menu position-absolute dropdown-menu-end" style="width: 20rem; max-width: 80vmin; text-align: justify">
+              <li class="dropdown-item-text text-center display-name">Belum Masuk</li>
               <li class="dropdown-divider"></li>
-              <li class="px-3" style="width: 20rem; max-width: 80vmin; text-align: justify">
-                Mohon maaf, fitur ini belum tersedia. Silahkan kirim masukan atau saran ke <a href="//api.whatsapp.com/send?phone=6282323864176" target="_blank">Whatsapp Kami.</a>
+              <li class="dropdown-item-text">
+                <button class="btn btn-sm btn-primary btn-login w-100"><i class="bx bx-fw bxl-google"></i>Masuk Dengan Google</button>
+              </li>
+              <li class="dropdown-item">
+                <button class="btn btn-sm btn-outline-primary w-100 btn-logout"><i class="bx bx-log-out bx-fw"></i>Keluar</button>
               </li>
             </ul>
           </div>
@@ -117,9 +112,11 @@
       import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-analytics.js";
       import { getDatabase, ref, set, onValue, child, get } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-database.js";
-      // TODO: Add SDKs for Firebase products that you want to use
-      // https://firebase.google.com/docs/web/setup#available-libraries
-      document.querySelector(".btn-collapse-chevron").click();
+      import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js";
+
+      window.onload = () => {
+        document.querySelector(".btn-collapse-chevron").click();
+      };
       // Your web app's Firebase configuration
       // For Firebase JS SDK v7.20.0 and later, measurementId is optional
       const firebaseConfig = {
@@ -137,17 +134,74 @@
       const app = initializeApp(firebaseConfig);
       const analytics = getAnalytics(app);
       const db = getDatabase(app);
+      const session = window.sessionStorage;
+      const urlParams = new URLSearchParams(window.location.search);
 
-      var session = window.sessionStorage;
-      // Check Session
-      if (!session.getItem("player_id") || !session.getItem("name")) {
-        session.setItem("name", prompt("Siapa nama lengkap anda?"));
-        session.setItem("player_id", "player_" + Math.floor(Math.random() * 10000));
+      // Check is set url parameter roomcode
+      if (!urlParams.has("room")) window.location.href = "index.html";
+
+      /*=============================================================================
+          Awal Authentication
+       ============================================================================= */
+      const btnLogin = document.querySelector("nav .account-information button.btn-login");
+      const btnLogout = document.querySelector("nav .account-information button.btn-logout");
+      const displayName = document.querySelector("nav .account-information .display-name");
+
+      const auth = getAuth();
+      const provider = new GoogleAuthProvider();
+      // provider.addScope("https://www.googleapis.com/auth/contacts.readonly");
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          const uid = user.uid;
+          session.setItem("uid", uid);
+          displayName.innerText = user.displayName;
+        } else {
+          session.removeItem("uid");
+          displayName.innerText = "Anda Belum Login";
+        }
+      });
+      function doSignIn() {
+        signInWithPopup(auth, provider)
+          .then((result) => {
+            // This gives you a Google Access Token. You can use it to access the Google API.
+            const credential = GoogleAuthProvider.credentialFromResult(result);
+            const token = credential.accessToken;
+            // The signed-in user info.
+            const user = result.user;
+            // ...
+            console.log("Success Login", user);
+            alert("Selamat datang, " + user.displayName);
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            // The email of the user's account used.
+            const email = error.customData.email;
+            // The AuthCredential type that was used.
+            const credential = GoogleAuthProvider.credentialFromError(error);
+            console.log("error Login", errorMessage);
+            // ...
+          });
+      }
+      function doSignOut() {
+        signOut(auth)
+          .then(() => {
+            // Sign-out successful.
+            alert("Anda telah keluar");
+          })
+          .catch((error) => {
+            alert("Gagal Logout! Silahkan mencoba kembali.");
+            // An error happened.
+          });
       }
 
-      const urlParams = new URLSearchParams(window.location.search);
-      console.log(urlParams);
-      if (!urlParams.has("room")) window.location.href = "index.html";
+      btnLogin.onclick = doSignIn;
+      btnLogout.onclick = doSignOut;
+
+      /*=============================================================================
+          Akhir Authentication
+       ============================================================================= */
+
       const Game = {
         roomCode: urlParams.get("room"),
       };
@@ -155,23 +209,31 @@
       document.querySelector(".room-information .btn-invite").href = `//api.whatsapp.com/send?text=Mabar%20yuk%2C%0A${window.location.href}`;
 
       // console.log(window.location.href);
-
+      if (!session.getItem("uid")) {
+        // if (confirm("Anda harus login terlebih dahulu!")) {
+        // alert("anda belum login gabisa");
+        doSignIn();
+        // return;
+      }
       // Get Room Information
       get(child(ref(db, "rooms"), String(Game.roomCode)))
         .then((snapshot) => {
           if (snapshot.exists()) {
+            // Kode room valid
             const data = snapshot.val();
             for (const key in data) Game[key] = data[key];
             if (data.created) Game.created = new Date(data.created);
             if (data.author) document.querySelector(".room-information .room-author").innerText = data.author;
             if (data.created) document.querySelector(".room-information .room-created").innerText = new Date(data.created).toLocaleString();
-            if (!data.hasOwnProperty(session.getItem("player_id")))
-              set(ref(db, `rooms/${String(Game.roomCode)}/players/${session.getItem("player_id")}`), {
-                name: session.getItem("name"),
-                id: session.getItem("player_id"),
+            // Jika user belum terdaftar sbg player maka daftarkan
+            if (!data.hasOwnProperty(session.getItem("uid")))
+              set(ref(db, `rooms/${String(Game.roomCode)}/players/${session.getItem("uid")}`), {
+                name: auth.currentUser.displayName,
+                id: session.getItem("uid"),
                 score: 0,
               });
           } else {
+            // RoomCode tidak valid
             alert("Maaf, room tidak ditemukan!");
             window.location.href = "index.html";
           }
@@ -181,13 +243,12 @@
             if (!snapshot.exists()) return;
             const data = snapshot.val();
             Game.players = data;
-            const leaderboard = document.querySelector(".leaderboard .content");
             console.log(data);
+            const leaderboard = document.querySelector(".leaderboard .content");
             leaderboard.innerText = "";
             for (const player_id in data) {
-              console.log(player_id);
               const item = document.createElement("div");
-              item.classList.add("d-flex", "justify-content-between", "bg-white", "shadow", "rounded", "mb-2", "p-2");
+              item.classList.add("leaderboard-player");
               item.innerHTML = `<div>${data[player_id]["name"]}</div><div>${data[player_id]["score"]}</div>`;
               leaderboard.appendChild(item);
             }

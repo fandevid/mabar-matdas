@@ -12,14 +12,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
 
     <link rel="stylesheet" href="style.css" />
-    <script>
-      var session = window.sessionStorage;
-      // Check Session
-      if (!session.getItem("player_id") || !session.getItem("name")) {
-        session.setItem("name", prompt("Siapa nama lengkap anda?"));
-        session.setItem("player_id", "player_" + Math.floor(Math.random() * 10000));
-      }
-    </script>
   </head>
   <body>
     <header>
@@ -27,13 +19,18 @@
         <div class="container">
           <a href="#Id2" class="nav-item nav-link" role="button" data-bs-toggle="offcanvas" aria-controls="Id2"><i class="bx bx-fw bx-menu"></i></a>
           <a href="#" class="navbar-brand">MathBasic</a>
-          <div class="dropdown">
+          <div class="dropdown account-information">
             <a role="button" class="my-auto nav-item nav-link" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bx bx-fw bxs-user-circle"></i></a>
-            <ul class="dropdown-menu position-absolute dropdown-menu-end" style="max-width: 80vmin">
-              <li class="dropdown-item text-center">Informasi Akun</li>
+            <ul class="dropdown-menu position-absolute dropdown-menu-end" style="width: 20rem; max-width: 80vmin; text-align: justify">
+              <li class="dropdown-item-text text-center display-name">Belum Masuk</li>
               <li class="dropdown-divider"></li>
-              <li class="px-3" style="width: 20rem; max-width: 80vmin; text-align: justify">
-                Mohon maaf, fitur ini belum tersedia. Silahkan kirim masukan atau saran ke <a href="//api.whatsapp.com/send?phone=6282323864176" target="_blank">Whatsapp Kami.</a>
+              <li class="dropdown-item-text">
+                <button class="btn btn-sm btn-primary btn-login w-100"><i class="bx bx-fw bxl-google"></i>Masuk Dengan Google</button>
+                <!-- <button class="btn btn-sm btn-outline-primary btn-logout">Keluar</button> -->
+              </li>
+              <li class="dropdown-item">
+                <!-- <a href="" role="button" class="btn-logout">Keluar</a> -->
+                <button class="btn btn-sm btn-outline-primary w-100 btn-logout"><i class="bx bx-log-out bx-fw"></i>Keluar</button>
               </li>
             </ul>
           </div>
@@ -80,7 +77,7 @@
       import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-analytics.js";
       import { getDatabase, ref, set, onValue, child, get } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-database.js";
-      import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js";
+      import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js";
 
       // TODO: Add SDKs for Firebase products that you want to use
       // https://firebase.google.com/docs/web/setup#available-libraries
@@ -102,68 +99,67 @@
       const app = initializeApp(firebaseConfig);
       const analytics = getAnalytics(app);
       const db = getDatabase(app);
+      const session = window.sessionStorage;
+
+      /*=============================================================================
+          Awal Authentication
+       ============================================================================= */
+      const btnLogin = document.querySelector("nav .account-information button.btn-login");
+      const btnLogout = document.querySelector("nav .account-information button.btn-logout");
+      const displayName = document.querySelector("nav .account-information .display-name");
 
       const auth = getAuth();
       const provider = new GoogleAuthProvider();
-      provider.addScope("https://www.googleapis.com/auth/contacts.readonly");
-      provider.setCustomParameters({
-        login_hint: "user@example.com",
-      });
-      function doSignIn() {
-        signInWithRedirect(auth, provider);
-      }
-      getRedirectResult(auth)
-        .then((result) => {
-          // This gives you a Google Access Token. You can use it to access Google APIs.
-          const credential = GoogleAuthProvider.credentialFromResult(result);
-          const token = credential.accessToken;
-
-          // The signed-in user info.
-          const user = result.user;
-          console.log("Success Login", user);
-        })
-        .catch((error) => {
-          // Handle Errors here.
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          // The email of the user's account used.
-          const email = error.customData.email;
-          // The AuthCredential type that was used.
-          const credential = GoogleAuthProvider.credentialFromError(error);
-          // ...
-          console.log("error Login", errorMessage);
-        });
-      console.log("currUser", auth.currentUser);
+      // provider.addScope("https://www.googleapis.com/auth/contacts.readonly");
       onAuthStateChanged(auth, (user) => {
         if (user) {
-          // User is signed in, see docs for a list of available properties
-          // https://firebase.google.com/docs/reference/js/firebase.User
           const uid = user.uid;
-          alert("SignIn", user);
-
-          // ...
+          session.setItem("uid", uid);
+          displayName.innerText = user.displayName;
         } else {
-          alert("SignOut", user);
-          doSignIn();
-          // User is signed out
-          // ...
+          session.removeItem("uid");
+          displayName.innerText = "Anda Belum Login";
         }
       });
+      function doSignIn() {
+        signInWithPopup(auth, provider)
+          .then((result) => {
+            // This gives you a Google Access Token. You can use it to access the Google API.
+            const credential = GoogleAuthProvider.credentialFromResult(result);
+            const token = credential.accessToken;
+            // The signed-in user info.
+            const user = result.user;
+            // ...
+            console.log("Success Login", user);
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            // The email of the user's account used.
+            const email = error.customData.email;
+            // The AuthCredential type that was used.
+            const credential = GoogleAuthProvider.credentialFromError(error);
+            console.log("error Login", errorMessage);
+            // ...
+          });
+      }
       function doSignOut() {
         signOut(auth)
           .then(() => {
             // Sign-out successful.
-            console.log("Success Logout");
+            alert("Anda telah keluar");
           })
           .catch((error) => {
-            console.log("Failed Logout");
+            alert("Gagal Logout! Silahkan mencoba kembali.");
             // An error happened.
           });
       }
 
-      var session = window.sessionStorage;
-
-      // Check Session
+      btnLogin.onclick = doSignIn;
+      btnLogout.onclick = doSignOut;
+      /*=============================================================================
+          Akhir Authentication
+       ============================================================================= */
 
       const btnCreateRoom = document.querySelector("button.btn-create-room");
       btnCreateRoom.addEventListener("click", createRoom);
@@ -171,6 +167,10 @@
       const formJoinRoom = document.forms["form_join_room"];
       formJoinRoom.addEventListener("submit", (e) => {
         e.preventDefault();
+        if (!session.getItem("uid") || !auth.currentUser) {
+          if (confirm("Anda harus login terlebih dahulu!")) doSignIn();
+          return;
+        }
         const inp = e.target[0];
         const btn = e.target[1];
         btn.disabled = true;
@@ -193,13 +193,18 @@
       });
 
       function createRoom() {
-        const room = String(Math.floor(Math.random() * 10000));
-        const author = session.getItem("name");
+        if (!session.getItem("uid") || !auth.currentUser) {
+          if (confirm("Anda harus login terlebih dahulu!")) doSignIn();
+          return;
+        }
+
+        const room = String(Math.floor(Math.random() * 100000));
+
         set(ref(db, "rooms/" + room), {
-          author: author,
+          author: auth.currentUser.displayName,
           created: new Date().getTime(),
-          questions: null,
-          players: {},
+          // questions: null,
+          // players: {},
           playing: false,
         })
           .then(() => {
