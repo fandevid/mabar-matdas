@@ -101,7 +101,10 @@
           <div class="display-soal">9 x 15 : 18 = ?</div>
         </section>
         <section>
-          <div class="leaderboard"></div>
+          <div class="leaderboard mt-3">
+            <div><strong>Leaderboard</strong></div>
+            <div class="content"></div>
+          </div>
         </section>
       </div>
     </main>
@@ -158,11 +161,11 @@
         .then((snapshot) => {
           if (snapshot.exists()) {
             const data = snapshot.val();
-            for (const key of Object.keys(data)) Game[key] = data[key];
+            for (const key in data) Game[key] = data[key];
             if (data.created) Game.created = new Date(data.created);
-            if (Game.author) document.querySelector(".room-information .room-author").innerText = Game.author;
-            if (Game.created) document.querySelector(".room-information .room-created").innerText = Game.created.toLocaleString();
-            if (!Game.players[session.getItem("player_id")])
+            if (data.author) document.querySelector(".room-information .room-author").innerText = data.author;
+            if (data.created) document.querySelector(".room-information .room-created").innerText = data.created.toLocaleString();
+            if (!data.hasOwnProperty(session.getItem("player_id")))
               set(ref(db, `rooms/${String(Game.roomCode)}/players/${session.getItem("player_id")}`), {
                 name: session.getItem("name"),
                 id: session.getItem("player_id"),
@@ -178,10 +181,13 @@
             if (!snapshot.exists()) return;
             const data = snapshot.val();
             Game.players = data;
-            const leaderboard = document.querySelector(".leaderboard");
+            const leaderboard = document.querySelector(".leaderboard .content");
             console.log(data);
-            for (const player_id of Object.keys(data)) {
+            leaderboard.innerText = "";
+            for (const player_id in data) {
+              console.log(player_id);
               const item = document.createElement("div");
+              item.classList.add("d-flex", "justify-content-between", "bg-white", "shadow", "rounded", "mb-2", "p-2");
               item.innerHTML = `<div>${data[player_id]["name"]}</div><div>${data[player_id]["score"]}</div>`;
               leaderboard.appendChild(item);
             }
@@ -189,8 +195,8 @@
         })
         .catch((error) => {
           alert("Terjadi kesalahan, silahkan coba lagi.");
-          // window.location.href = "index.html";
           console.error(error);
+          // window.location.href = "index.html";
         });
     </script>
   </body>
