@@ -12,6 +12,25 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
     <link rel="stylesheet" href="css/play.css" />
     <link rel="stylesheet" href="style.css" />
+    <style>
+      .display-option {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(10rem, 50%));
+        margin: 1rem;
+        gap: 1rem;
+      }
+      .display-option .option {
+        background-color: white;
+        border: 1px solid lightgray;
+        height: 5rem;
+        border-radius: 7px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5rem;
+        font-weight: medium;
+      }
+    </style>
   </head>
   <body>
     <header>
@@ -53,7 +72,7 @@
       <div class="container">
         <section>
           <div class="room-information">
-            <div class="bg-white mb-3 gap-1 d-flex align-items-center justify-content-evenly p-2 rounded" style="border: 1px solid lightgrey">
+            <div class="bg-white mb-2 gap-1 d-flex align-items-center justify-content-evenly p-2 rounded" style="border: 1px solid lightgrey">
               <!-- <div class="w-100 text-center text-primary">Kode: <span class="room_code"></span></div>
                 <span class="opacity-25">|</span> -->
               <!-- <span class="opacity-25">|</span> -->
@@ -66,7 +85,7 @@
             </div>
 
             <div class="collapse" id="collapseGameInfo">
-              <div class="bg-white mb-3 p-2 rounded" style="border: 1px solid lightgrey">
+              <div class="bg-white mb-2 p-2 rounded" style="border: 1px solid lightgrey">
                 <div>
                   <table>
                     <tr>
@@ -94,6 +113,13 @@
         </section>
         <section>
           <div class="display-soal">9 x 15 : 18 = ?</div>
+
+          <div class="display-option">
+            <div class="option">65</div>
+            <div class="option">45</div>
+            <div class="option">67</div>
+            <div class="option">87</div>
+          </div>
         </section>
         <section>
           <div class="leaderboard mt-3">
