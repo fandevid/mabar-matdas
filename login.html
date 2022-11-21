@@ -4,87 +4,49 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Mabar Game Matematika Online" />
-    <title>Selamat Datang - M. Irfan</title>
+    <meta name="description" content="Login Account fandevid.github.io" />
+    <title>Login Account - M. Irfan</title>
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <link rel="stylesheet" href="style.css" />
-    <script>
-      var session = window.sessionStorage;
-      // Check Session
-      if (!session.getItem("player_id") || !session.getItem("name")) {
-        session.setItem("name", prompt("Siapa nama lengkap anda?"));
-        session.setItem("player_id", "player_" + Math.floor(Math.random() * 10000));
+    <style>
+      body {
+        overflow-x: hidden;
+        background-color: #f5f5f5;
+        font-family: outfit, sans-serif;
+        --vh: 100vh;
+        /* visibility: hidden; */
       }
-    </script>
+    </style>
   </head>
   <body>
-    <header>
-      <nav class="navbar navbar-light shadow">
-        <div class="container">
-          <a href="#Id2" class="nav-item nav-link" role="button" data-bs-toggle="offcanvas" aria-controls="Id2"><i class="bx bx-fw bx-menu"></i></a>
-          <a href="#" class="navbar-brand">MathBasic</a>
-          <div class="dropdown">
-            <a role="button" class="my-auto nav-item nav-link" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bx bx-fw bxs-user-circle"></i></a>
-            <ul class="dropdown-menu position-absolute dropdown-menu-end" style="max-width: 80vmin">
-              <li class="dropdown-item text-center">Informasi Akun</li>
-              <li class="dropdown-divider"></li>
-              <li class="px-3" style="width: 20rem; max-width: 80vmin; text-align: justify">
-                Mohon maaf, fitur ini belum tersedia. Silahkan kirim masukan atau saran ke <a href="//api.whatsapp.com/send?phone=6282323864176" target="_blank">Whatsapp Kami.</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <!-- <div style="height: 1rem; width: 100%"></div> -->
-      </nav>
-
-      <div class="offcanvas offcanvas-start" data-bs-backdrop="static" tabindex="-1" id="Id2" aria-labelledby="staticBackdropLabel">
-        <div class="offcanvas-header">
-          <h5 class="offcanvas-title" id="staticBackdropLabel">MathBasic</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body">
-          <div>Mohon maaf, fitur ini belum tersedia. Silahkan kirim masukan atau saran ke <a href="//api.whatsapp.com/send?phone=6282323864176" target="_blank">Whatsapp Kami.</a></div>
-        </div>
-      </div>
-    </header>
-
-    <!-- <button class="btn-create-room">Buat Room</button> -->
-    <main class="mt-3">
+    <main>
       <section>
-        <div>
-          <div class="container">
-            <form name="form_join_room" autocomplete="off">
-              <div class="form-group mb-3">
-                <label for="" class="form-label"><strong>Bergabung ke room</strong></label>
-                <div class="custom-input-group">
-                  <input type="text" name="room_code" pattern="[0-9]*" placeholder="Masukan kode room" required />
-                  <button type="submit" class="btn btn-primary">Gabung</button>
-                </div>
-              </div>
-            </form>
-            <button class="btn btn-outline-primary py-2 btn-create-room w-100"><i class="bx bx-fw bx-plus"></i>Buat Room Baru</button>
+        <div class="container">
+          <div class="d-flex justify-content-center align-items-center" style="height: var(--vh)">
+            <div class="content p-3 rounded-2 bg-white shadow" style="max-width: 25rem">
+              <img src="assets/undraw_job_offers_re_634p.svg" style="width: 100%" alt="" />
+              <h3 class="mt-2">Masuk Ke Website <span class="" style="color: #6c63ff">MathBasic</span></h3>
+              <p class="" style="text-align: justify; opacity: 0.75">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci quas ea necessitatibus illum harum recusandae ducimus asperiores ipsa? Nostrum, quos?</p>
+              <button class="btn btn-outline-primary w-100 btn-login-google mb-2"><i class="bx bx-fw bxl-google"></i> Masuk Dengan Google</button>
+              <button class="btn btn-outline-primary w-100 btn-login-facebook"><i class="bx bx-fw bxl-facebook"></i> Masuk Dengan Facebook</button>
+            </div>
           </div>
         </div>
       </section>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
     <!-- <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
     <script type="module">
-      // Import the functions you need from the SDKs you need
       import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
-      import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-analytics.js";
+      import { getAuth, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js";
 
-      // TODO: Add SDKs for Firebase products that you want to use
-      // https://firebase.google.com/docs/web/setup#available-libraries
+      document.body.style = "--vh: " + window.innerHeight + "px";
 
-      // Your web app's Firebase configuration
-      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
       const firebaseConfig = {
         apiKey: "AIzaSyAkcudM2WZPq3n__YgbWtKUbP2x2Lw8jZY",
         authDomain: "fandev-game-497e8.firebaseapp.com",
@@ -98,57 +60,80 @@
 
       // Initialize Firebase
       const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+
+      const session = window.sessionStorage;
+
+      // if (session.getItem("uid")) hasLoggedIn();
+
       const auth = getAuth();
-
-      const email = "ada@gmails.com";
-      const password = "adakami123";
-      function doRegister() {
-        createUserWithEmailAndPassword(auth, email, password)
-          .then((userCredential) => {
-            // Signed in
-            const user = userCredential.user;
-            console.log("berhasil", user);
-            // ...
-          })
-          .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            console.log("Gagal", errorMessage);
-            // ..
-          });
-      }
-      function doLogin() {
-        signInWithEmailAndPassword(auth, email, password)
-          .then((userCredential) => {
-            // Signed in
-            const user = userCredential.user;
-            console.log("berhasil", user);
-            // ...
-          })
-          .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            console.log("Gagal", errorMessage);
-          });
-      }
-
+      auth.languageCode = "id";
+      const provider = new GoogleAuthProvider();
+      // provider.addScope("https://www.googleapis.com/auth/contacts.readonly");
       onAuthStateChanged(auth, (user) => {
         if (user) {
-          // User is signed in, see docs for a list of available properties
-          // https://firebase.google.com/docs/reference/js/firebase.User
           const uid = user.uid;
-          console.log("SignIn", user);
-          // ...
+          session.setItem("uid", uid);
+          Swal.fire({
+            icon: "error",
+            titleText: "Sudah Login",
+            text: "Anda telah login dengan email <" + auth.currentUser.email + ">",
+          }).then(() => (window.location.href = "index.html"));
         } else {
-          console.log("SignOut", user);
-          // User is signed out
-          // ...
+          document.body.style.visibility = "unset";
+          session.removeItem("uid");
         }
       });
-      console.log(auth.currentUser);
-      setTimeout(() => {
-        console.log(auth.currentUser);
-      }, 5000);
+
+      function doSignIn() {
+        if (auth.currentUser) {
+          return Swal.fire({
+            icon: "error",
+            titleText: "Sudah Login",
+            text: "Anda telah login dengan email <" + auth.currentUser.email + ">",
+          }).then(() => (window.location.href = "index.html"));
+        }
+        signInWithPopup(auth, provider)
+          .then((result) => {
+            // This gives you a Google Access Token. You can use it to access the Google API.
+            const credential = GoogleAuthProvider.credentialFromResult(result);
+            const token = credential.accessToken;
+            const user = result.user;
+            session.setItem("uid", user.uid);
+            Swal.fire({
+              iconHtml: `<img src='${user.photoURL}'>`,
+              titleText: "Login Berhasil",
+              text: `Selamat datang, ${user.displayName} <${user.email}>`,
+            }).then(() => (window.location.href = "index.html"));
+          })
+          .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            // The email of the user's account used.
+            const email = error.customData.email;
+            // The AuthCredential type that was used.
+            const credential = GoogleAuthProvider.credentialFromError(error);
+            // console.log("error Login", errorMessage);
+            Swal.fire({
+              icon: "error",
+              titleText: "Login Gagal",
+              text: errorMessage,
+              showConfirmButton: false,
+            });
+          });
+      }
+      window.onload = () => {
+        const btnLoginFacebook = document.querySelector(".btn-login-facebook");
+        const btnLoginGoogle = document.querySelector(".btn-login-google");
+        btnLoginFacebook.onclick = () =>
+          Swal.fire({
+            icon: "error",
+            titleText: "Login Gagal!",
+            text: "Login dengan facebook sementara belum kami aktifkan, silahkan login dengan akun google.",
+            showConfirmButton: false,
+          });
+        btnLoginGoogle.onclick = doSignIn;
+      };
     </script>
   </body>
 </html>

@@ -12,25 +12,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css" />
     <link rel="stylesheet" href="css/play.css" />
     <link rel="stylesheet" href="style.css" />
-    <style>
-      .display-option {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(10rem, 50%));
-        margin: 1rem;
-        gap: 1rem;
-      }
-      .display-option .option {
-        background-color: white;
-        border: 1px solid lightgray;
-        height: 5rem;
-        border-radius: 7px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 1.5rem;
-        font-weight: medium;
-      }
-    </style>
   </head>
   <body>
     <header>
@@ -38,17 +19,16 @@
         <div class="container">
           <a href="#Id2" class="nav-item nav-link" role="button" data-bs-toggle="offcanvas" aria-controls="Id2"><i class="bx bx-fw bx-menu"></i></a>
           <a href="#" class="navbar-brand">MathBasic</a>
-          <!-- <a href="" class="btn btn-sm btn-outline-success"><i class="bx bx-fw bxl-whatsapp"></i>Undang</a> -->
           <div class="dropdown account-information">
             <a role="button" class="my-auto nav-item nav-link" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="bx bx-fw bxs-user-circle"></i></a>
             <ul class="dropdown-menu position-absolute dropdown-menu-end" style="width: 20rem; max-width: 80vmin; text-align: justify">
               <li class="dropdown-item-text text-center display-name">Belum Masuk</li>
               <li class="dropdown-divider"></li>
               <li class="dropdown-item-text">
-                <button class="btn btn-sm btn-primary btn-login w-100"><i class="bx bx-fw bxl-google"></i>Masuk Dengan Google</button>
+                <a href="login.html" class="btn btn-sm btn-primary btn-login w-100">Login Account</a>
               </li>
               <li class="dropdown-item">
-                <button class="btn btn-sm btn-outline-primary w-100 btn-logout"><i class="bx bx-log-out bx-fw"></i>Keluar</button>
+                <a href="logout.html" class="btn btn-sm btn-outline-primary w-100 btn-logout"><i class="bx bx-log-out bx-fw"></i>Logout Account</a>
               </li>
             </ul>
           </div>
@@ -163,83 +143,44 @@
       const session = window.sessionStorage;
       const urlParams = new URLSearchParams(window.location.search);
 
-      // Check is set url parameter roomcode
-      if (!urlParams.has("room")) window.location.href = "index.html";
-
-      /*=============================================================================
-          Awal Authentication
-       ============================================================================= */
-      const btnLogin = document.querySelector("nav .account-information button.btn-login");
-      const btnLogout = document.querySelector("nav .account-information button.btn-logout");
-      const displayName = document.querySelector("nav .account-information .display-name");
-
-      const auth = getAuth();
-      const provider = new GoogleAuthProvider();
-      // provider.addScope("https://www.googleapis.com/auth/contacts.readonly");
-
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          const uid = user.uid;
-          session.setItem("uid", uid);
-          displayName.innerText = user.displayName;
-          console.log("sudah login");
-          start();
-        } else {
-          console.log("belum login");
-          session.removeItem("uid");
-          displayName.innerText = "Anda Belum Login";
-          doSignIn();
-          // alert("do Login");
-        }
-      });
-      getRedirectResult(auth)
-        .then((result) => {
-          if (result) {
-            const user = result.user;
-            const uid = user.uid;
-            session.setItem("uid", uid);
-            displayName.innerText = user.displayName;
-          }
-        })
-        .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          console.log("error Login", errorMessage);
-          // ...
-        });
-      function doSignIn() {
-        signInWithRedirect(auth, provider);
-      }
-      function doSignOut() {
-        signOut(auth)
-          .then(() => {
-            // Sign-out successful.
-            alert("Anda telah keluar");
-          })
-          .catch((error) => {
-            alert("Gagal Logout! Silahkan mencoba kembali.");
-            // An error happened.
-          });
-      }
-
-      btnLogin.onclick = doSignIn;
-      btnLogout.onclick = doSignOut;
-
-      /*=============================================================================
-          Akhir Authentication
-       ============================================================================= */
-
       const Game = {
         roomCode: urlParams.get("room"),
       };
       document.querySelector(".room-information .room-code").innerText = Game.roomCode;
       document.querySelector(".room-information .btn-invite").href = `//api.whatsapp.com/send?text=Mabar%20yuk%2C%0A${window.location.href}`;
 
+      // Check is set url parameter roomcode
+      if (!urlParams.has("room")) window.location.href = "index.html";
+
+      /*=============================================================================
+          Awal Authentication
+       ============================================================================= */
+      const auth = getAuth();
+      let firstLoadUser = true;
+      onAuthStateChanged(auth, (user) => {
+        const displayName = document.querySelector("nav .account-information .display-name");
+        if (user) {
+          session.setItem("uid", user.uid);
+          displayName.innerText = user.displayName;
+          if (firstLoadUser) {
+            start();
+          }
+        } else {
+          session.removeItem("uid");
+          displayName.innerText = "Anda Belum Login";
+          window.location.href = "login.html";
+        }
+        firstLoadUser = false;
+      });
+      /*=============================================================================
+          Akhir Authentication
+       ============================================================================= */
+
       // console.log(window.location.href);
 
       // Get Room Information
       function start() {
-        if (!session.getItem("uid") || !auth.currentUser) {
+        if (!auth.currentUser) {
           return;
         }
         get(child(ref(db, "rooms"), String(Game.roomCode)))
@@ -252,16 +193,21 @@
               if (data.author) document.querySelector(".room-information .room-author").innerText = data.author;
               if (data.created) document.querySelector(".room-information .room-created").innerText = new Date(data.created).toLocaleString();
               // Jika user belum terdaftar sbg player maka daftarkan
-              if (!data.hasOwnProperty(session.getItem("uid")))
-                set(ref(db, `rooms/${String(Game.roomCode)}/players/${session.getItem("uid")}`), {
+              if (!data.hasOwnProperty(auth.currentUser.uid))
+                set(ref(db, `rooms/${String(Game.roomCode)}/players/${auth.currentUser.uid}`), {
                   name: auth.currentUser.displayName,
-                  id: session.getItem("uid"),
+                  id: auth.currentUser.uid,
                   score: 0,
                 });
             } else {
               // RoomCode tidak valid
-              alert("Maaf, room tidak ditemukan!");
-              window.location.href = "index.html";
+              Swal.fire({
+                icon: "error",
+                titleText: "Tidak Ditemukan",
+                text: "Room tidak ditemukan. Pastikan URL anda benar.",
+                showCloseButton: true,
+                showConfirmButton: false,
+              }).then((e) => (window.location.href = "index.html"));
             }
           })
           .then(() => {
@@ -281,8 +227,13 @@
             });
           })
           .catch((error) => {
-            alert("Terjadi kesalahan, silahkan coba lagi.");
-            console.log(error);
+            Swal.fire({
+              icon: "error",
+              titleText: "Terjadi Kesalahan",
+              html: "Mohon maaf telah membuat anda tidak nyaman, kami akan segera memperbaiki bug pada website kami. Kirimkan saran ke <a href='//api.whatsapp.com/send?phone=6282323864176'>Whatsapp kami</a>",
+              showConfirmButton: false,
+              showCloseButton: true,
+            });
             // window.location.href = "index.html";
           });
       }

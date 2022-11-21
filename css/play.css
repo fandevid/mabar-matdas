@@ -30,3 +30,20 @@
   margin-bottom: 0.5rem;
 }
 
+.display-option {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(10rem, 50%));
+  margin: 1rem;
+  gap: 1rem;
+}
+.display-option .option {
+  background-color: white;
+  border: 1px solid lightgray;
+  height: 5rem;
+  border-radius: 7px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: medium;
+}

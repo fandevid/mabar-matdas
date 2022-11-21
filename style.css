@@ -8,11 +8,11 @@ nav.navbar {
   background: white;
   /* font-family: montserrat; */
   /* color: white; */
-  padding-block: 0.25rem !important;
+  /* padding-block: 0.25rem !important; */
 }
 
 nav.navbar .navbar-brand {
-  color: #e79c2b !important;
+  color: #6c63ff !important;
   /* margin-right: auto; */
   font-weight: 600;
   font-family: outfit, sans-serif;
