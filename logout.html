@@ -51,7 +51,7 @@
             icon: "success",
             titleText: "Logout Berhasil",
             confirmButtonText: "Kembali",
-          }).then(() => (window.location.href = "index.html"));
+          }).then(() => (window.location.href = session.getItem("currentURL") ?? "index.html"));
         })
         .catch((error) => {
           Swal.fire({
@@ -59,7 +59,7 @@
             titleText: "Logout Gagal",
             text: error.message,
             confirmButtonText: "Kembali",
-          }).then(() => (window.location.href = "index.html"));
+          }).then(() => (window.location.href = session.getItem("currentURL") ?? "index.html"));
         });
       console.log(auth);
     </script>
