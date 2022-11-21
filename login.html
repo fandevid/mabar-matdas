@@ -17,7 +17,6 @@
         background-color: #f5f5f5;
         font-family: outfit, sans-serif;
         --vh: 100vh;
-        /* visibility: hidden; */
       }
     </style>
   </head>
@@ -64,8 +63,6 @@
 
       const session = window.sessionStorage;
 
-      // if (session.getItem("uid")) hasLoggedIn();
-
       const auth = getAuth();
       auth.languageCode = "id";
       const provider = new GoogleAuthProvider();
@@ -78,7 +75,7 @@
             icon: "error",
             titleText: "Sudah Login",
             text: "Anda telah login dengan email <" + auth.currentUser.email + ">",
-          }).then(() => (window.location.href = "index.html"));
+          }).then(() => (window.location.href = session.getItem("currentURL") ?? "index.html"));
         } else {
           document.body.style.visibility = "unset";
           session.removeItem("uid");
@@ -91,7 +88,7 @@
             icon: "error",
             titleText: "Sudah Login",
             text: "Anda telah login dengan email <" + auth.currentUser.email + ">",
-          }).then(() => (window.location.href = "index.html"));
+          }).then(() => (window.location.href = session.getItem("currentURL") ?? "index.html"));
         }
         signInWithPopup(auth, provider)
           .then((result) => {
@@ -104,7 +101,7 @@
               iconHtml: `<img src='${user.photoURL}'>`,
               titleText: "Login Berhasil",
               text: `Selamat datang, ${user.displayName} <${user.email}>`,
-            }).then(() => (window.location.href = "index.html"));
+            }).then(() => (window.location.href = session.getItem("currentURL") ?? "index.html"));
           })
           .catch((error) => {
             const errorCode = error.code;

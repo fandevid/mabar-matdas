@@ -99,6 +99,7 @@
       const db = getDatabase(app);
       const session = window.sessionStorage;
 
+      session.setItem("currentURL", window.location.href);
       /*=============================================================================
           Awal Authentication
        ============================================================================= */
@@ -239,7 +240,6 @@
             btn.disabled = false;
           });
       });
-
     </script>
   </body>
 </html>
