@@ -152,9 +152,9 @@
               allowOutsideClick: false,
               cancelButtonText: "Lain Kali",
             }).then((result) => {
+              e.target.disabled = false;
               if (result.isConfirmed) document.location.href = "login.html";
             });
-            e.target.disabled = false;
           }
 
           const room = String(Math.floor(Math.random() * 90000 + 10000));
